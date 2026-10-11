@@ -7,7 +7,9 @@
 
 <!-- Grouped by task: bugs fixed and features implemented (component + template). -->
 
--
+- Task 1:
+  - The **diff/preview** misclassifies a changed line item (`diff.spec.ts`): the test failes here becasue we only classified a change request as changed only if the quantity of the baseline value has changed, but a change request also changes if the quantity changes as well. So instead of having this line of code: **(const changed = b.unitPrice !== p.unitPrice)**, we also add the comparsion for the quanitity change like this **(const changed = b.unitPrice !== p.unitPrice || b.quantity !== p.quantity;)**
+  - The **detail** page enables Approve for a user who isn't permitted (`cr-detail.component.spec.ts`): 
 
 ## 2. Component & state model
 
