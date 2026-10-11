@@ -19,6 +19,14 @@
 - *the loading / loaded / empty / error states are wired — keep them correct:* When a change request status is not the same as the status filter, the list is empty but it doesn't show any messages, so in the `cr-list.componenet.html`, in the paragraph where it is set to show "No change requests to show," i added **"|| visibleRows.length == 0"** so that it shows the message if the list is empty or if there is an error. also in the table, the table headers will show if **"visibleRows.length > 0"**, so now the headers will not show as well if the list is empty. This provides a better user expierence.
    
 
+### **Task 3:**
+
+- *the **diff/preview panel** (added / removed / changed / unchanged rows, with totals and delta):* No additional component or template changes were needed for this part. Everything is already working perfectly
+- *the **approval timeline**, rendered **chronologically:*** For this part of the details pane, I implemented it using the sort function. Since each timeline entry’s `at` contains its date, I used getTime() to convert that date into a number, and then subtracted number a from number b to order them from oldest to latest. 
+- ***permission-aware action visibility:** whether Approve/Reject are offered/enabled must respect both the CR's status and the user's policies:*
+- ***Approve / Reject actions** that call the API and behave correctly on a slow or failing response:*
+- ***Reject reason validation**: a reason is required before Reject can proceed:*
+
 ## 2. Component & state model
 
 - The app consists of two main panels: one with a list of change requests and a filter for status , and a details panel that shows the proposed changes, totals, approval timeline and action controls for the selected change request.
