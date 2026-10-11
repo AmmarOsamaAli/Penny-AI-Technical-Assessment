@@ -23,9 +23,9 @@
 
 - *the **diff/preview panel** (added / removed / changed / unchanged rows, with totals and delta):* No additional component or template changes were needed for this part. Everything is already working perfectly
 - *the **approval timeline**, rendered **chronologically:*** For this part of the details pane, I implemented it using the sort function. Since each timeline entry’s `at` contains its date, I used getTime() to convert that date into a number, and then subtracted number a from number b to order them from oldest to latest. 
-- ***permission-aware action visibility:** whether Approve/Reject are offered/enabled must respect both the CR's status and the user's policies:*
-- ***Approve / Reject actions** that call the API and behave correctly on a slow or failing response:*
-- ***Reject reason validation**: a reason is required before Reject can proceed:*
+- *permission-aware action visibility: whether Approve/Reject are offered/enabled must respect both the CR's status and the user's policies:* previously I had a mistake where I checked the user ID with 'mona', I replaced that with `canApprovePolicy(this.session.user)`, so that approval depends on the user's policies instead of a specific user. It also checks that the change request status is **"PENDING_APPROVAL"**. The template uses this result to disable the Approve button if the user is not permitted. Reject still needs the same permission check in canReject.
+- *Approve / Reject actions that call the API and behave correctly on a slow or failing response:* In approve() and reject(), I replaced the “not implemented” errors with calls to the provided API. I added submitting so that the buttons are disabled while waiting for a response and repeated clicks cannot send another action. If the action succeeds, the detail pane updates and updated.emit() reloads the list, so both panes show the new status. If it fails, actionError shows the error message, and finally resets submitting so the user can try again.
+- *Reject reason validation: a reason is required before Reject can proceed:* In `rejectControl`, I added `Validators.required` and `Validators.pattern(/\S/)`, so that the reason cannot be empty or contain only spaces. The template disables Reject while the reason is invalid. In `reject()`, I also check the validation before calling the API and use `.trim()` to remove spaces from the beginning and end of the submitted reason.
 
 ## 2. Component & state model
 
