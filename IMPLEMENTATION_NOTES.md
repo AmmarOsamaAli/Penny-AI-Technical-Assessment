@@ -7,9 +7,10 @@
 
 <!-- Grouped by task: bugs fixed and features implemented (component + template). -->
 
-- Task 1:
-  - The **diff/preview** misclassifies a changed line item (`diff.spec.ts`): the test failes here becasue we only classified a change request as changed only if the quantity of the baseline value has changed, but a change request also changes if the quantity changes as well. So instead of having this line of code: **(const changed = b.unitPrice !== p.unitPrice)**, we also add the comparsion for the quanitity change like this **(const changed = b.unitPrice !== p.unitPrice || b.quantity !== p.quantity;)**
-  - The **detail** page enables Approve for a user who isn't permitted (`cr-detail.component.spec.ts`): 
+### **Task 1:**
+  - The **diff/preview** misclassifies a changed line item (`diff.spec.ts`): The test failes here becasue, in `diff.util.ts`, we only classified a change request as changed only if the quantity of the baseline value has changed, but a change request is also considered as 'changed' if the quantity changes as well. So instead of having this line of code: **(const changed = b.unitPrice !== p.unitPrice)**, we also add the comparsion for the quantity change like this **(const changed = b.unitPrice !== p.unitPrice || b.quantity !== p.quantity;)**
+  - The **detail** page enables Approve for a user who isn't permitted (`cr-detail.component.spec.ts`): In the `cr-detail.componenet.ts`, the canApprove() function only considers that, we can approve if the change request is pending-approval, but it doesn't consider the user role whether it is an approver or viewer. So, we have to check if the current user is an approver, only then we enable the button, otherwise it is disabled. Before implementing this, the canApprove() function only returned this: **return this.detail?.status === 'PENDING_APPROVAL';**, but now that we have to check the user as well, the function should return this: **return this.detail?.status === 'PENDING_APPROVAL' && this.session.user.id === 'mona';**. This should also be implemented for the canReject function, but since you didn't ask I will not modify the code.
+
 
 ## 2. Component & state model
 
