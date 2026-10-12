@@ -21,7 +21,16 @@ export class CrListComponent implements OnInit {
 
 	state: ViewState<CrSummary[]> = idle();
 	statusFilter: CrStatus | 'ALL' = 'ALL';
-	readonly statuses: (CrStatus | 'ALL')[] = ['ALL', 'DRAFT', 'SUBMITTED', 'PENDING_APPROVAL', 'APPROVED', 'APPLIED', 'REJECTED', 'CANCELLED'];
+	readonly statuses: (CrStatus | 'ALL')[] = [
+		'ALL',
+		'DRAFT',
+		'SUBMITTED',
+		'PENDING_APPROVAL',
+		'APPROVED',
+		'APPLIED',
+		'REJECTED',
+		'CANCELLED',
+	];
 
 	constructor(private readonly api: CrApiService, private readonly session: SessionService) {}
 
@@ -33,7 +42,7 @@ export class CrListComponent implements OnInit {
 		this.state = loading();
 		try {
 			const rows = await this.api.listChangeRequests(this.session.user);
-			this.state = { status: rows.length  ? 'loaded' : 'empty', data: rows };
+			this.state = { status: rows.length ? 'loaded' : 'empty', data: rows };
 		} catch (err) {
 			this.state = { status: 'error', data: null, error: (err as Error).message };
 		}
@@ -46,11 +55,10 @@ export class CrListComponent implements OnInit {
 	/** Rows to render, after applying the active status filter. */
 	get visibleRows(): CrSummary[] {
 		const rows = this.state.data ?? [];
-		// TODO: narrow `rows` by `this.statusFilter` ('ALL' shows everything).
-		if(this.statusFilter === 'ALL'){
-			return rows
+		if (this.statusFilter === 'ALL') {
+			return rows;
 		} else {
-			return rows.filter((CR)=> CR.status === this.statusFilter)
+			return rows.filter((CR) => CR.status === this.statusFilter);
 		}
 	}
 }

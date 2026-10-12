@@ -27,7 +27,7 @@ export class CrDetailComponent implements OnChanges {
 	state: ViewState<CrDetail> = idle();
 	submitting = false;
 	actionError?: string;
-	// TODO: add validation so the form is invalid until a reason is entered.
+	private loadVersion = 0;
 	rejectControl = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(/\S/)] });
 
 	constructor(private readonly api: CrApiService, private readonly session: SessionService) {}
@@ -38,12 +38,15 @@ export class CrDetailComponent implements OnChanges {
 	}
 
 	async load(): Promise<void> {
+		const version = ++this.loadVersion;
 		this.state = loading();
 		this.actionError = undefined;
 		try {
 			const detail = await this.api.getChangeRequest(this.session.user, this.id);
+			if (version !== this.loadVersion) return;
 			this.state = { status: 'loaded', data: detail };
 		} catch (err) {
+			if (version !== this.loadVersion) return;
 			this.state = { status: 'error', data: null, error: (err as Error).message };
 		}
 	}
@@ -58,19 +61,17 @@ export class CrDetailComponent implements OnChanges {
 
 	/** Approval timeline, oldest-first. */
 	get timeline(): TimelineEntry[] {
-		// TODO: return the audit entries ordered chronologically (oldest first).
 		const auditDetails = this.detail?.audit ?? [];
 		return [...auditDetails].sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime());
 	}
 
 	/** Whether the current user may approve the loaded CR. */
 	get canApprove(): boolean {
-		// NOTE: this only looks at the CR status. The UI must also respect the user's permissions.
 		return this.detail?.status === 'PENDING_APPROVAL' && canApprovePolicy(this.session.user);
 	}
 
 	get canReject(): boolean {
-		return this.canApprove
+		return this.canApprove;
 	}
 
 	fmt(amount: number): string {
@@ -78,40 +79,45 @@ export class CrDetailComponent implements OnChanges {
 	}
 
 	async approve(): Promise<void> {
-		// TODO: perform the approve action through the API and reflect the outcome in the view.
 		if (!this.canApprove || this.submitting) return;
-
+		const version = this.loadVersion;
 		this.submitting = true;
 		this.actionError = undefined;
 
 		try {
 			const detail = await this.api.approve(this.session.user, this.id, new Date().toISOString());
-			this.state = { status: 'loaded', data: detail };
+			if (version === this.loadVersion) {
+				this.state = { status: 'loaded', data: detail };
+			}
 			this.updated.emit();
 		} catch (err) {
-			this.actionError = (err as Error).message;
+			if (version === this.loadVersion) {
+				this.actionError = (err as Error).message;
+			}
 		} finally {
 			this.submitting = false;
 		}
 	}
 
 	async reject(): Promise<void> {
-		// TODO: require a valid rejectControl, then perform the reject action through the API and
-		//       reflect the outcome in the view.
 		if (!this.canReject || this.submitting) return;
 
 		this.rejectControl.markAsTouched();
 		if (this.rejectControl.invalid) return;
-
+		const version = this.loadVersion;
 		this.submitting = true;
 		this.actionError = undefined;
 
 		try {
 			const detail = await this.api.reject(this.session.user, this.id, new Date().toISOString(), this.rejectControl.value.trim());
-			this.state = { status: 'loaded', data: detail };
+			if (version === this.loadVersion) {
+				this.state = { status: 'loaded', data: detail };
+			}
 			this.updated.emit();
 		} catch (err) {
-			this.actionError = (err as Error).message;
+			if (version === this.loadVersion) {
+				this.actionError = (err as Error).message;
+			}
 		} finally {
 			this.submitting = false;
 		}

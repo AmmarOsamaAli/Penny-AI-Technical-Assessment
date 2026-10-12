@@ -41,7 +41,9 @@ export class CrApiService {
 			.filter((s) => s.orgCode === user.orgCode)
 			.map((s) => {
 				const d = this.detailStore[s.id];
-				return d ? { id: d.id, title: d.title, status: d.status, orgCode: d.orgCode, delta: d.delta, currency: d.currency, updatedAt: d.updatedAt } : { ...s };
+				return d
+					? { id: d.id, title: d.title, status: d.status, orgCode: d.orgCode, delta: d.delta, currency: d.currency, updatedAt: d.updatedAt }
+					: { ...s };
 			});
 		return this.settle(rows);
 	}
@@ -64,7 +66,9 @@ export class CrApiService {
 		const cr = this.detailStore[id];
 		if (!cr || cr.orgCode !== user.orgCode) return this.fail<CrDetail>('Not found');
 		const updated: CrDetail = { ...cr, status, updatedAt: at, audit: [...cr.audit, { action, byUserId: user.id, at, note }] };
-		this.detailStore[id] = updated;
-		return this.settle({ ...updated });
+		return this.settle({ ...updated }).then((detail) => {
+			this.detailStore[id] = updated;
+			return detail;
+		});
 	}
 }

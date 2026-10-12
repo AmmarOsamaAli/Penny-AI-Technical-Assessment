@@ -21,4 +21,19 @@ describe('computeDiff', () => {
 		const rows = computeDiff(base, [{ ...base[0], quantity: 11 }, base[1]]);
 		expect(rows.find((r) => r.sku === 'SKU-A')?.kind).toBe('changed');
 	});
+
+	it('detects a price-only change', () => {
+		const rows = computeDiff(base, [{ ...base[0], unitPrice: 600 }, base[1]]);
+
+		expect(rows.find((row) => row.sku === 'SKU-A')?.kind).toBe('changed');
+	});
+
+	it('classifies matching items as unchanged', () => {
+		const rows = computeDiff(
+			base,
+			base.map((item) => ({ ...item })),
+		);
+
+		expect(rows.map((row) => row.kind)).toEqual(['unchanged', 'unchanged']);
+	});
 });
