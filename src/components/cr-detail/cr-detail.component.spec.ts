@@ -13,7 +13,7 @@ async function render(user: ReqUser, id: string): Promise<ComponentFixture<CrDet
 	});
 	await TestBed.compileComponents();
 	const fixture = TestBed.createComponent(CrDetailComponent);
-	fixture.componentInstance.id = id;
+	fixture.componentRef.setInput('id', id)
 	fixture.detectChanges(); // ngOnInit -> load()
 	await flush(); // let the mock API resolve
 	fixture.detectChanges(); // render the loaded state

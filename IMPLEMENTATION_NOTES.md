@@ -27,6 +27,11 @@
 - *Approve / Reject actions that call the API and behave correctly on a slow or failing response:* In approve() and reject(), I replaced the “not implemented” errors with calls to the provided API. I added submitting so that the buttons are disabled while waiting for a response and repeated clicks cannot send another action. If the action succeeds, the detail pane updates and updated.emit() reloads the list, so both panes show the new status. If it fails, actionError shows the error message, and finally resets submitting so the user can try again.
 - *Reject reason validation: a reason is required before Reject can proceed:* In `rejectControl`, I added `Validators.required` and `Validators.pattern(/\S/)`, so that the reason cannot be empty or contain only spaces. The template disables Reject while the reason is invalid. In `reject()`, I also check the validation before calling the API and use `.trim()` to remove spaces from the beginning and end of the submitted reason.
 
+
+### **Task 4:**
+
+- *Role/permission-aware + UX states:* The read-only user can see the request data, but Approve is disabled and Reject is hidden because both actions check the request status and the user’s policies. In `cr-list.component.html`, I updated the empty-message condition so that it only appears when there are no requests or no matching filtered rows, instead of also appearing during loading or errors. The existing templates show loading messages, error messages, and Retry buttons. I also replaced `ngOnInit()` with `ngOnChanges()` in the detail component so that clicking another request updates the right pane, and reset the rejection reason when switching requests.
+
 ## 2. Component & state model
 
 - The app consists of two main panels: one with a list of change requests and a filter for status , and a details panel that shows the proposed changes, totals, approval timeline and action controls for the selected change request.
